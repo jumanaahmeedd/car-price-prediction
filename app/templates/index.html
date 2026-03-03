@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Price Prediction</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        input, select { width: 200px; margin-bottom: 15px; padding: 5px; }
+        button { padding: 10px 20px; font-size: 16px; }
+        .prediction { margin-top: 20px; font-size: 20px; color: green; }
+    </style>
+</head>
+
+<body>
+
+    <h1>Car Price Prediction</h1>
+
+    <form action="/predict" method="POST">
+
+        <label>Levy:</label><br>
+        <input type="number" step="any" name="Levy" required><br>
+
+        <label>Manufacturer:</label><br>
+        <input type="text" name="Manufacturer" required><br>
+
+        <label>Model:</label><br>
+        <input type="text" name="Model" required><br>
+
+        <label>Production Year:</label><br>
+        <input type="number" name="Prod. year" required><br>
+
+        <label>Category:</label><br>
+        <input type="text" name="Category" required><br>
+
+        <label>Leather Interior:</label><br>
+        <select name="Leather interior" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select><br>
+
+        <label>Fuel Type:</label><br>
+        <input type="text" name="Fuel type" required><br>
+
+        <label>Engine Volume:</label><br>
+        <input type="number" step="any" name="Engine volume" required><br>
+
+        <label>Mileage:</label><br>
+        <input type="number" name="Mileage" required><br>
+
+        <label>Gear Box Type:</label><br>
+        <input type="text" name="Gear box type" required><br>
+
+        <label>Drive Wheels:</label><br>
+        <input type="text" name="Drive wheels" required><br>
+
+        <button type="submit">Predict Price</button>
+    </form>
+
+    {% if prediction %}
+        <div class="prediction">
+            Predicted Price: {{ prediction }}
+        </div>
+    {% endif %}
+
+</body>
+</html>
