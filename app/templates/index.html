@@ -2,65 +2,653 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Price Prediction</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 50px; }
-        input, select { width: 200px; margin-bottom: 15px; padding: 5px; }
-        button { padding: 10px 20px; font-size: 16px; }
-        .prediction { margin-top: 20px; font-size: 20px; color: green; }
+        :root {
+            --bg: #111316;
+            --bg-elevated: rgba(22, 25, 30, 0.9);
+            --panel: rgba(15, 17, 21, 0.78);
+            --panel-strong: rgba(19, 22, 27, 0.94);
+            --line: rgba(255, 255, 255, 0.1);
+            --line-strong: rgba(255, 255, 255, 0.18);
+            --text: #f5f1e8;
+            --text-muted: #b8b1a4;
+            --accent: #d8ab67;
+            --accent-strong: #f0c17b;
+            --accent-soft: rgba(216, 171, 103, 0.18);
+            --success-bg: rgba(132, 195, 148, 0.12);
+            --success-line: rgba(132, 195, 148, 0.3);
+            --success-text: #d4efd9;
+            --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.38);
+            --shadow-strong: 0 36px 100px rgba(0, 0, 0, 0.55);
+            --radius-lg: 28px;
+            --radius-md: 18px;
+            --radius-sm: 12px;
+            --space-1: 0.5rem;
+            --space-2: 0.75rem;
+            --space-3: 1rem;
+            --space-4: 1.25rem;
+            --space-5: 1.5rem;
+            --space-6: 2rem;
+            --space-7: 3rem;
+            --space-8: 4rem;
+            --display-size: clamp(2.8rem, 5vw, 5.4rem);
+            --title-size: clamp(1.5rem, 2vw, 2rem);
+            --body-size: 1rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            color-scheme: dark;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            font-size: var(--body-size);
+            line-height: 1.5;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(216, 171, 103, 0.2), transparent 32%),
+                radial-gradient(circle at 85% 15%, rgba(69, 81, 99, 0.45), transparent 24%),
+                linear-gradient(145deg, #0b0d10 0%, #14181d 45%, #0f1217 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: radial-gradient(circle at center, black, transparent 88%);
+            opacity: 0.26;
+        }
+
+        body::after {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(6, 8, 10, 0.55) 100%);
+        }
+
+        .shell {
+            width: min(1240px, calc(100% - 2rem));
+            margin: 0 auto;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(0, 1.02fr) minmax(420px, 0.98fr);
+            gap: var(--space-6);
+            align-items: center;
+            padding: var(--space-7) 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero,
+        .form-panel {
+            animation: rise-in 0.9s ease forwards;
+            opacity: 0;
+            transform: translateY(26px);
+        }
+
+        .form-panel {
+            animation-delay: 0.12s;
+        }
+
+        .hero {
+            padding: var(--space-7) var(--space-6);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid rgba(216, 171, 103, 0.28);
+            background: rgba(216, 171, 103, 0.08);
+            color: var(--accent-strong);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .hero h1 {
+            margin: var(--space-4) 0 var(--space-3);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: var(--display-size);
+            line-height: 0.97;
+            letter-spacing: -0.04em;
+            max-width: 10ch;
+        }
+
+        .hero p {
+            margin: 0 0 var(--space-6);
+            max-width: 34rem;
+            color: var(--text-muted);
+            font-size: 1.06rem;
+        }
+
+        .hero-highlights {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-3);
+        }
+
+        .highlight {
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(12px);
+        }
+
+        .highlight strong {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--text);
+            font-size: 0.96rem;
+        }
+
+        .highlight span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .form-panel {
+            position: relative;
+            padding: 1px;
+            border-radius: calc(var(--radius-lg) + 1px);
+            background:
+                linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06) 28%, rgba(216, 171, 103, 0.2) 100%);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .form-panel::before {
+            content: "";
+            position: absolute;
+            inset: auto 12% -18% 12%;
+            height: 24%;
+            background: radial-gradient(circle, rgba(216, 171, 103, 0.18), transparent 72%);
+            filter: blur(28px);
+            pointer-events: none;
+        }
+
+        .form-card {
+            position: relative;
+            border-radius: var(--radius-lg);
+            background:
+                linear-gradient(180deg, rgba(24, 28, 34, 0.96), rgba(15, 18, 22, 0.97));
+            border: 1px solid var(--line);
+            padding: var(--space-6);
+            backdrop-filter: blur(18px);
+            overflow: hidden;
+        }
+
+        .form-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(140deg, rgba(255, 255, 255, 0.04), transparent 34%);
+            pointer-events: none;
+        }
+
+        .card-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: var(--space-5);
+        }
+
+        .card-header h2 {
+            margin: 0 0 0.45rem;
+            font-size: var(--title-size);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .card-header p {
+            margin: 0;
+            color: var(--text-muted);
+            max-width: 34rem;
+        }
+
+        .prediction-banner {
+            position: relative;
+            z-index: 1;
+            margin-bottom: var(--space-5);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--success-line);
+            background:
+                linear-gradient(180deg, rgba(132, 195, 148, 0.12), rgba(132, 195, 148, 0.05)),
+                rgba(255, 255, 255, 0.02);
+            color: var(--success-text);
+            overflow-wrap: anywhere;
+        }
+
+        .prediction-banner span {
+            display: block;
+            color: rgba(212, 239, 217, 0.76);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.74rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .prediction-banner strong {
+            font-size: clamp(1.1rem, 1vw + 0.95rem, 1.5rem);
+            font-weight: 700;
+        }
+
+        form {
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section {
+            margin: 0 0 var(--space-5);
+            padding: 0;
+            border: 0;
+        }
+
+        .form-section legend {
+            margin: 0;
+            padding: 0;
+            font-size: 0.94rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+        }
+
+        .section-header {
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .section-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.83rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-4);
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .field label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: rgba(245, 241, 232, 0.92);
+        }
+
+        .field .hint {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            padding: 0.95rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font: inherit;
+            outline: none;
+            transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+            appearance: none;
+        }
+
+        .field input::placeholder {
+            color: rgba(184, 177, 164, 0.62);
+        }
+
+        .field select {
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+                linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+            background-position:
+                calc(100% - 20px) calc(50% - 3px),
+                calc(100% - 14px) calc(50% - 3px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 3rem;
+        }
+
+        .field input:hover,
+        .field select:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: rgba(216, 171, 103, 0.72);
+            box-shadow: 0 0 0 4px rgba(216, 171, 103, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: var(--space-2);
+            border: 0;
+            border-radius: 999px;
+            padding: 1rem 1.35rem;
+            background: linear-gradient(135deg, var(--accent-strong), #b88744);
+            color: #1b1611;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 18px 40px rgba(216, 171, 103, 0.24);
+            transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 48px rgba(216, 171, 103, 0.32);
+            filter: brightness(1.03);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:focus-visible {
+            outline: 3px solid rgba(240, 193, 123, 0.52);
+            outline-offset: 4px;
+        }
+
+        .microcopy {
+            margin-top: var(--space-3);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        @keyframes rise-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1120px) {
+            .shell {
+                grid-template-columns: minmax(0, 1fr);
+                padding-top: var(--space-6);
+                padding-bottom: var(--space-6);
+            }
+
+            .hero {
+                padding-bottom: var(--space-3);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .hero-highlights,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 1rem, 1240px);
+                gap: var(--space-4);
+            }
+
+            .hero,
+            .form-card {
+                padding-left: var(--space-4);
+                padding-right: var(--space-4);
+            }
+
+            .hero {
+                padding-top: var(--space-5);
+                padding-bottom: 0;
+            }
+
+            .form-card {
+                padding-top: var(--space-5);
+                padding-bottom: var(--space-5);
+            }
+        }
     </style>
 </head>
-
 <body>
+    <main class="shell">
+        <section class="hero" aria-labelledby="page-title">
+            <div class="eyebrow">Vehicle Value Estimator</div>
+            <h1 id="page-title">Find a confident market-ready price for your car.</h1>
+            <p>
+                Enter the core details of your vehicle to receive a cleaner, faster estimate experience designed
+                to feel more like a premium showroom than a raw prediction form.
+            </p>
 
-    <h1>Car Price Prediction</h1>
+            <div class="hero-highlights" aria-label="Estimator benefits">
+                <article class="highlight">
+                    <strong>Market-aware estimate</strong>
+                    <span>Structured inputs help produce a more consistent valuation snapshot.</span>
+                </article>
+                <article class="highlight">
+                    <strong>Clean submission flow</strong>
+                    <span>Grouped sections reduce friction and keep the form easy to scan.</span>
+                </article>
+                <article class="highlight">
+                    <strong>Instant result display</strong>
+                    <span>Your predicted price appears directly inside the experience after submission.</span>
+                </article>
+            </div>
+        </section>
 
-    <form action="/predict" method="POST">
+        <section class="form-panel" aria-label="Prediction form container">
+            <div class="form-card">
+                <header class="card-header">
+                    <h2>Predict vehicle value</h2>
+                    <p>Review the details below, complete the required fields, and submit for a polished estimate.</p>
+                </header>
 
-        <label>Levy:</label><br>
-        <input type="number" step="any" name="Levy" required><br>
+                {% if prediction %}
+                    <div class="prediction-banner" aria-live="polite">
+                        <span>Predicted price</span>
+                        <strong>{{ prediction }}</strong>
+                    </div>
+                {% endif %}
 
-        <label>Manufacturer:</label><br>
-        <input type="text" name="Manufacturer" required><br>
+                <form action="/predict" method="POST">
+                    <fieldset class="form-section">
+                        <legend>Pricing context</legend>
+                        <div class="section-header">
+                            <p>Use current taxation and year details for a more grounded estimate.</p>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="levy">Levy</label>
+                                <input
+                                    id="levy"
+                                    type="number"
+                                    step="any"
+                                    min="0"
+                                    name="Levy"
+                                    placeholder="e.g. 1320"
+                                    aria-describedby="levy-hint"
+                                    required
+                                >
+                                <span class="hint" id="levy-hint">Enter the levy amount using your local value format.</span>
+                            </div>
 
-        <label>Model:</label><br>
-        <input type="text" name="Model" required><br>
+                            <div class="field">
+                                <label for="prod-year">Production Year</label>
+                                <input
+                                    id="prod-year"
+                                    type="number"
+                                    min="1950"
+                                    max="2035"
+                                    name="Prod. year"
+                                    placeholder="e.g. 2018"
+                                    aria-describedby="prod-year-hint"
+                                    required
+                                >
+                                <span class="hint" id="prod-year-hint">Use the vehicle's manufacturing year.</span>
+                            </div>
+                        </div>
+                    </fieldset>
 
-        <label>Production Year:</label><br>
-        <input type="number" name="Prod. year" required><br>
+                    <fieldset class="form-section">
+                        <legend>Vehicle identity</legend>
+                        <div class="section-header">
+                            <p>Capture the brand, model, and key cabin details.</p>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="manufacturer">Manufacturer</label>
+                                <input
+                                    id="manufacturer"
+                                    type="text"
+                                    name="Manufacturer"
+                                    placeholder="e.g. Toyota"
+                                    required
+                                >
+                            </div>
 
-        <label>Category:</label><br>
-        <input type="text" name="Category" required><br>
+                            <div class="field">
+                                <label for="model">Model</label>
+                                <input
+                                    id="model"
+                                    type="text"
+                                    name="Model"
+                                    placeholder="e.g. Camry"
+                                    required
+                                >
+                            </div>
 
-        <label>Leather Interior:</label><br>
-        <select name="Leather interior" required>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select><br>
+                            <div class="field">
+                                <label for="category">Category</label>
+                                <input
+                                    id="category"
+                                    type="text"
+                                    name="Category"
+                                    placeholder="e.g. Sedan"
+                                    required
+                                >
+                            </div>
 
-        <label>Fuel Type:</label><br>
-        <input type="text" name="Fuel type" required><br>
+                            <div class="field">
+                                <label for="leather-interior">Leather Interior</label>
+                                <select id="leather-interior" name="Leather interior" required>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
 
-        <label>Engine Volume:</label><br>
-        <input type="number" step="any" name="Engine volume" required><br>
+                    <fieldset class="form-section">
+                        <legend>Powertrain and usage</legend>
+                        <div class="section-header">
+                            <p>Specify the drivetrain and usage profile that shape resale value.</p>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="fuel-type">Fuel Type</label>
+                                <input
+                                    id="fuel-type"
+                                    type="text"
+                                    name="Fuel type"
+                                    placeholder="e.g. Petrol"
+                                    required
+                                >
+                            </div>
 
-        <label>Mileage:</label><br>
-        <input type="number" name="Mileage" required><br>
+                            <div class="field">
+                                <label for="engine-volume">Engine Volume</label>
+                                <input
+                                    id="engine-volume"
+                                    type="number"
+                                    step="any"
+                                    min="0"
+                                    name="Engine volume"
+                                    placeholder="e.g. 2.0"
+                                    aria-describedby="engine-volume-hint"
+                                    required
+                                >
+                                <span class="hint" id="engine-volume-hint">Use liters or the exact numeric format your model expects.</span>
+                            </div>
 
-        <label>Gear Box Type:</label><br>
-        <input type="text" name="Gear box type" required><br>
+                            <div class="field">
+                                <label for="mileage">Mileage</label>
+                                <input
+                                    id="mileage"
+                                    type="number"
+                                    min="0"
+                                    name="Mileage"
+                                    placeholder="e.g. 85000"
+                                    aria-describedby="mileage-hint"
+                                    required
+                                >
+                                <span class="hint" id="mileage-hint">Enter total driven distance as a whole number.</span>
+                            </div>
 
-        <label>Drive Wheels:</label><br>
-        <input type="text" name="Drive wheels" required><br>
+                            <div class="field">
+                                <label for="gear-box-type">Gear Box Type</label>
+                                <input
+                                    id="gear-box-type"
+                                    type="text"
+                                    name="Gear box type"
+                                    placeholder="e.g. Automatic"
+                                    required
+                                >
+                            </div>
 
-        <button type="submit">Predict Price</button>
-    </form>
+                            <div class="field">
+                                <label for="drive-wheels">Drive Wheels</label>
+                                <input
+                                    id="drive-wheels"
+                                    type="text"
+                                    name="Drive wheels"
+                                    placeholder="e.g. Front"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </fieldset>
 
-    {% if prediction %}
-        <div class="prediction">
-            Predicted Price: {{ prediction }}
-        </div>
-    {% endif %}
-
+                    <button class="submit-button" type="submit">Predict Price</button>
+                    <p class="microcopy">All required fields are preserved exactly for the existing prediction pipeline.</p>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
