@@ -14,7 +14,6 @@ model = load_model()
 def prepare_data(data):
     Levy = data.get('Levy')
     Manufacturer = data.get('Manufacturer')
-    Model = data.get('Model')
     Prod_year = data.get('Prod. year')
     Category = data.get('Category')
     Leather_interior = data.get('Leather interior')
@@ -27,7 +26,6 @@ def prepare_data(data):
     prepared = pd.DataFrame({
         "Levy": [float(Levy)],
         "Manufacturer": [Manufacturer],
-        "Model": [Model],
         "Prod. year": [int(Prod_year)],
         "Category": [Category],
         "Leather interior": [Leather_interior],
