@@ -29,7 +29,7 @@ def load_model():
 model = load_model()
 
 # List of numeric and categorical columns
-numeric_cols = ["Levy", "Engine volume", "Mileage", "Prod. year", "Cylinders", "Airbags"]
+numeric_cols = ["Levy", "Engine volume", "Mileage", "Prod. year"]
 categorical_cols = ["Manufacturer", "Category", "Leather interior", "Fuel type", "Gear box type", "Drive wheels"]
 
 # Prepare data safely
