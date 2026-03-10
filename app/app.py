@@ -1,53 +1,71 @@
-from flask import Flask, jsonify, request, render_template
-import joblib
+from flask import Flask, request, jsonify, render_template
 import pandas as pd
+import joblib
 
 app = Flask(__name__)
 
-def load_model():
-    model_file = open(r'C:\Users\juman\OneDrive\Desktop\car-price-prediction\model\carpriceprediction.joblib', 'rb')
-    model = joblib.load(model_file)
-    return model
-
-model = load_model()
-
-def prepare_data(data):
-    Levy = data.get('Levy')
-    Manufacturer = data.get('Manufacturer')
-    Prod_year = data.get('Prod. year')
-    Category = data.get('Category')
-    Leather_interior = data.get('Leather interior')
-    Fuel_type = data.get('Fuel type')
-    Engine_volume = data.get('Engine volume')
-    Mileage = data.get('Mileage')
-    Gear_box_type = data.get('Gear box type')
-    Drive_wheels = data.get('Drive wheels')
-
-    prepared = pd.DataFrame({
-        "Levy": [float(Levy)],
-        "Manufacturer": [Manufacturer],
-        "Prod. year": [int(Prod_year)],
-        "Category": [Category],
-        "Leather interior": [Leather_interior],
-        "Fuel type": [Fuel_type],
-        "Engine volume": [float(Engine_volume)],
-        "Mileage": [int(Mileage)],
-        "Gear box type": [Gear_box_type],
-        "Drive wheels": [Drive_wheels]
-    })
-
-    return prepared
+# Load trained pipeline (model + preprocessing)
+model = joblib.load("car_price_model.joblib")
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.form
-    prepared_data = prepare_data(data)
-    prediction = model.predict(prepared_data)[0]
-
-    return render_template('index.html', prediction=round(prediction, 2))
-
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('index.html')
-app.run()
+    return render_template("index.html")
+
+
+@app.route("/predict", methods=["POST"])
+def predict():
+
+    try:
+        # get form data
+        data = request.form.to_dict()
+
+        # convert numeric fields
+        numeric_cols = [
+            "Levy",
+            "Mileage",
+            "Engine volume",
+            "Prod. year",
+            "Cylinders",
+            "Airbags"
+        ]
+
+        for col in numeric_cols:
+            if col in data:
+                data[col] = float(data[col])
+
+        # convert to dataframe
+        df = pd.DataFrame([data])
+
+        # prediction
+        prediction = model.predict(df)[0]
+
+        return render_template(
+            "index.html",
+            prediction_text=f"Estimated Car Price: ${round(prediction,2)}"
+        )
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route("/predict", methods=["POST"])
+def predict_api():
+
+    try:
+        data = request.get_json(force=True)
+
+        df = pd.DataFrame([data])
+
+        prediction = model.predict(df)[0]
+
+        return jsonify({
+            "predicted_price": float(prediction)
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
