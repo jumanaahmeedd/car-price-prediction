@@ -3,99 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DriveValue Predictor</title>
+    <title>DriveValue Car Price Predictor</title>
     <style>
-        /* Your original CSS goes here — no changes needed */
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d1218, #151d27);
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 3rem auto;
+            background: rgba(25, 35, 50, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+        }
+        h1 {
+            text-align: center;
+            color: #74c0ff;
+        }
+        p.description {
+            text-align: center;
+            color: #a5b5c9;
+            margin-bottom: 2rem;
+        }
+        form {
+            display: grid;
+            gap: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #c0d2e7;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #74c0ff50;
+            background: #151d27;
+            color: #f0f0f0;
+            font-size: 1rem;
+        }
+        input:focus, select:focus {
+            border-color: #74c0ff;
+            outline: none;
+            box-shadow: 0 0 6px #74c0ff66;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #ffb44d, #ff9f1a);
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 50px;
+            color: #0d1218;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        .prediction {
+            margin-top: 1.5rem;
+            background: rgba(96, 206, 150, 0.2);
+            border: 1px solid rgba(96, 206, 150, 0.4);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #d7f8ea;
+        }
+        @media(max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-<main class="shell">
-    <div class="top-strip"></div>
+    <div class="container">
+        <h1>DriveValue Car Price Predictor</h1>
+        <p class="description">Estimate your car's price with ease using our ML-powered model.</p>
 
-    <header class="header">
-        <div>
-            <h1>DriveValue Car Price Predictor</h1>
-            <p>Automotive-themed estimator with your existing Flask pipeline.</p>
-        </div>
-        <div class="signature">Jumana Ahmed</div>
-    </header>
-
-    <section class="content">
         {% if prediction_text %}
-        <div class="prediction" aria-live="polite">
-            <small>Predicted Price</small>
-            <strong>{{ prediction_text }}</strong>
+        <div class="prediction">
+            {{ prediction_text }}
         </div>
         {% endif %}
 
         <form action="/predict" method="POST">
-            <div class="section">
-                <h2>Vehicle Profile</h2>
-                <div class="grid">
-                    <div class="field">
-                        <label for="levy">Levy</label>
-                        <input id="levy" type="number" step="any" min="0" name="Levy" placeholder="e.g. 1320" required>
-                    </div>
-                    <div class="field">
-                        <label for="manufacturer">Manufacturer</label>
-                        <input id="manufacturer" type="text" name="Manufacturer" placeholder="e.g. Toyota" required>
-                    </div>
-                    <div class="field">
-                        <label for="prod-year">Prod. year</label>
-                        <input id="prod-year" type="number" step="1" min="1950" max="2035" name="Prod. year" placeholder="e.g. 2018" required>
-                    </div>
-                    <div class="field">
-                        <label for="category">Category</label>
-                        <input id="category" type="text" name="Category" placeholder="e.g. Sedan" required>
-                    </div>
-                    <div class="field">
-                        <label for="leather">Leather interior</label>
-                        <select id="leather" name="Leather interior" required>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="fuel-type">Fuel type</label>
-                        <select id="fuel-type" name="Fuel type" required>
-                            <option value="Petrol">Petrol</option>
-                            <option value="Diesel">Diesel</option>
-                            <option value="Hybrid">Hybrid</option>
-                            <option value="Electric">Electric</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="engine-volume">Engine volume</label>
-                        <input id="engine-volume" type="number" step="any" min="0" name="Engine volume" placeholder="e.g. 2.0" required>
-                    </div>
-                    <div class="field">
-                        <label for="mileage">Mileage</label>
-                        <input id="mileage" type="number" step="1" min="0" name="Mileage" placeholder="e.g. 85000" required>
-                    </div>
-                    <div class="field">
-                        <label for="gear-box">Gear box type</label>
-                        <select id="gear-box" name="Gear box type" required>
-                            <option value="Automatic">Automatic</option>
-                            <option value="Manual">Manual</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="drive-wheels">Drive wheels</label>
-                        <select id="drive-wheels" name="Drive wheels" required>
-                            <option value="Front">Front</option>
-                            <option value="Rear">Rear</option>
-                            <option value="AWD">AWD</option>
-                        </select>
-                    </div>
+            <div class="grid">
+                <div>
+                    <label for="levy">Levy</label>
+                    <input id="levy" type="number" step="any" min="0" name="Levy" placeholder="e.g. 1320" required>
+                </div>
+                <div>
+                    <label for="manufacturer">Manufacturer</label>
+                    <input id="manufacturer" type="text" name="Manufacturer" placeholder="e.g. Toyota" required>
+                </div>
+                <div>
+                    <label for="prod-year">Prod. year</label>
+                    <input id="prod-year" type="number" min="1950" max="2035" name="Prod. year" placeholder="e.g. 2018" required>
+                </div>
+                <div>
+                    <label for="category">Category</label>
+                    <input id="category" type="text" name="Category" placeholder="e.g. Sedan" required>
+                </div>
+                <div>
+                    <label for="leather">Leather interior</label>
+                    <select id="leather" name="Leather interior" required>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="fuel-type">Fuel type</label>
+                    <select id="fuel-type" name="Fuel type" required>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Electric">Electric</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="engine-volume">Engine volume</label>
+                    <input id="engine-volume" type="number" step="any" min="0" name="Engine volume" placeholder="e.g. 2.0" required>
+                </div>
+                <div>
+                    <label for="mileage">Mileage</label>
+                    <input id="mileage" type="number" step="1" min="0" name="Mileage" placeholder="e.g. 85000" required>
+                </div>
+                <div>
+                    <label for="gear-box">Gear box type</label>
+                    <select id="gear-box" name="Gear box type" required>
+                        <option value="Automatic">Automatic</option>
+                        <option value="Manual">Manual</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="drive-wheels">Drive wheels</label>
+                    <select id="drive-wheels" name="Drive wheels" required>
+                        <option value="Front">Front</option>
+                        <option value="Rear">Rear</option>
+                        <option value="AWD">AWD</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="actions">
-                <button class="submit" type="submit">Predict Price</button>
-                <div class="note">Compatible with your Flask endpoint and model input schema.</div>
-            </div>
+            <button class="submit-btn" type="submit">Predict Price</button>
         </form>
-    </section>
-</main>
+    </div>
 </body>
 </html>
